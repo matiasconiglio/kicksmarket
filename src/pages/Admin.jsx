@@ -1,16 +1,53 @@
-import productos from "../data/productos";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import productosData from "../data/productos";
 
 function Admin() {
   const navigate = useNavigate();
+  const [productos, setProductos] = useState([]);
+  const [nuevoProducto, setNuevoProducto] = useState({
+    nombre: "",
+    precio: "",
+    stock: "",
+    categoria: "",
+    imagen: "",
+    descripcion: "",
+  });
 
+  // Protegemos la ruta
   useEffect(() => {
     const logged = localStorage.getItem("adminLoggedIn");
     if (logged !== "true") {
       navigate("/login");
     }
+
+    // Cargar productos desde localStorage o data
+    const almacenados = JSON.parse(localStorage.getItem("productos"));
+    setProductos(almacenados || productosData);
   }, []);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNuevoProducto({ ...nuevoProducto, [name]: value });
+  };
+
+  const handleAgregarProducto = (e) => {
+    e.preventDefault();
+    const id = Date.now(); // id único
+    const nuevo = {
+      id,
+      ...nuevoProducto,
+      precio: Number(nuevoProducto.precio),
+      stock: Number(nuevoProducto.stock),
+    };
+
+    const actualizados = [...productos, nuevo];
+    setProductos(actualizados);
+    localStorage.setItem("productos", JSON.stringify(actualizados));
+
+    // limpiar form
+    setNuevoProducto({ nombre: "", precio: "", stock: "", categoria: "" });
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("adminLoggedIn");
@@ -25,6 +62,54 @@ function Admin() {
           Cerrar sesión
         </button>
       </div>
+
+      <form onSubmit={handleAgregarProducto} className="row g-3 mb-4">
+        <div className="col-md-3">
+          <input
+            name="nombre"
+            className="form-control"
+            value={nuevoProducto.nombre}
+            onChange={handleInputChange}
+            placeholder="Nombre"
+            required
+          />
+        </div>
+        <div className="col-md-2">
+          <input
+            name="precio"
+            type="number"
+            className="form-control"
+            value={nuevoProducto.precio}
+            onChange={handleInputChange}
+            placeholder="Precio"
+            required
+          />
+        </div>
+        <div className="col-md-2">
+          <input
+            name="stock"
+            type="number"
+            className="form-control"
+            value={nuevoProducto.stock}
+            onChange={handleInputChange}
+            placeholder="Stock"
+            required
+          />
+        </div>
+        <div className="col-md-3">
+          <input
+            name="categoria"
+            className="form-control"
+            value={nuevoProducto.categoria}
+            onChange={handleInputChange}
+            placeholder="Categoría"
+            required
+          />
+        </div>
+        <div className="col-md-2">
+          <button className="btn btn-success w-100">Agregar</button>
+        </div>
+      </form>
 
       <table className="table table-bordered table-hover">
         <thead className="table-dark">
