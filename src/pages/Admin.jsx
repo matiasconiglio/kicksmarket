@@ -14,14 +14,12 @@ function Admin() {
     descripcion: "",
   });
 
-  // Protegemos la ruta
   useEffect(() => {
     const logged = localStorage.getItem("adminLoggedIn");
     if (logged !== "true") {
       navigate("/login");
     }
 
-    // Cargar productos desde localStorage o data
     const almacenados = JSON.parse(localStorage.getItem("productos"));
     setProductos(almacenados || productosData);
   }, []);
@@ -33,7 +31,14 @@ function Admin() {
 
   const handleAgregarProducto = (e) => {
     e.preventDefault();
-    const id = Date.now(); // id único
+
+    // Validar imagen opcional (solo si querés evitar errores de render)
+    if (!nuevoProducto.imagen.startsWith("http")) {
+      alert("Por favor, ingresá una URL de imagen válida");
+      return;
+    }
+
+    const id = Date.now();
     const nuevo = {
       id,
       ...nuevoProducto,
@@ -45,8 +50,25 @@ function Admin() {
     setProductos(actualizados);
     localStorage.setItem("productos", JSON.stringify(actualizados));
 
-    // limpiar form
-    setNuevoProducto({ nombre: "", precio: "", stock: "", categoria: "" });
+    setNuevoProducto({
+      nombre: "",
+      precio: "",
+      stock: "",
+      categoria: "",
+      imagen: "",
+      descripcion: "",
+    });
+  };
+
+  const handleEliminarProducto = (id) => {
+    const confirmacion = window.confirm(
+      "¿Seguro que querés eliminar este producto?"
+    );
+    if (!confirmacion) return;
+
+    const filtrados = productos.filter((p) => p.id !== id);
+    setProductos(filtrados);
+    localStorage.setItem("productos", JSON.stringify(filtrados));
   };
 
   const handleLogout = () => {
@@ -106,6 +128,26 @@ function Admin() {
             required
           />
         </div>
+        <div className="col-md-4">
+          <input
+            name="imagen"
+            className="form-control"
+            value={nuevoProducto.imagen}
+            onChange={handleInputChange}
+            placeholder="URL de imagen"
+            required
+          />
+        </div>
+        <div className="col-md-8">
+          <input
+            name="descripcion"
+            className="form-control"
+            value={nuevoProducto.descripcion}
+            onChange={handleInputChange}
+            placeholder="Descripción"
+            required
+          />
+        </div>
         <div className="col-md-2">
           <button className="btn btn-success w-100">Agregar</button>
         </div>
@@ -132,7 +174,12 @@ function Admin() {
               <td>{p.categoria}</td>
               <td>
                 <button className="btn btn-sm btn-warning me-2">Editar</button>
-                <button className="btn btn-sm btn-danger">Eliminar</button>
+                <button
+                  className="btn btn-sm btn-danger"
+                  onClick={() => handleEliminarProducto(p.id)}
+                >
+                  Eliminar
+                </button>
               </td>
             </tr>
           ))}
