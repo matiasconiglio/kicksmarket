@@ -5,6 +5,8 @@ import productosData from "../data/productos";
 function Admin() {
   const navigate = useNavigate();
   const [productos, setProductos] = useState([]);
+  const [modoEdicion, setModoEdicion] = useState(false);
+  const [productoEditandoId, setProductoEditandoId] = useState(null);
   const [nuevoProducto, setNuevoProducto] = useState({
     nombre: "",
     precio: "",
@@ -29,26 +31,38 @@ function Admin() {
     setNuevoProducto({ ...nuevoProducto, [name]: value });
   };
 
-  const handleAgregarProducto = (e) => {
+  const handleSubmitProducto = (e) => {
     e.preventDefault();
 
-    // Validar imagen opcional (solo si querés evitar errores de render)
     if (!nuevoProducto.imagen.startsWith("http")) {
       alert("Por favor, ingresá una URL de imagen válida");
       return;
     }
 
-    const id = Date.now();
-    const nuevo = {
-      id,
-      ...nuevoProducto,
-      precio: Number(nuevoProducto.precio),
-      stock: Number(nuevoProducto.stock),
-    };
-
-    const actualizados = [...productos, nuevo];
-    setProductos(actualizados);
-    localStorage.setItem("productos", JSON.stringify(actualizados));
+    if (modoEdicion) {
+      // EDITAR
+      const actualizados = productos.map((p) =>
+        p.id === productoEditandoId
+          ? { ...nuevoProducto, id: productoEditandoId }
+          : p
+      );
+      setProductos(actualizados);
+      localStorage.setItem("productos", JSON.stringify(actualizados));
+      setModoEdicion(false);
+      setProductoEditandoId(null);
+    } else {
+      // AGREGAR
+      const id = Date.now();
+      const nuevo = {
+        id,
+        ...nuevoProducto,
+        precio: Number(nuevoProducto.precio),
+        stock: Number(nuevoProducto.stock),
+      };
+      const actualizados = [...productos, nuevo];
+      setProductos(actualizados);
+      localStorage.setItem("productos", JSON.stringify(actualizados));
+    }
 
     setNuevoProducto({
       nombre: "",
@@ -71,6 +85,12 @@ function Admin() {
     localStorage.setItem("productos", JSON.stringify(filtrados));
   };
 
+  const handleEditarProducto = (producto) => {
+    setNuevoProducto(producto);
+    setModoEdicion(true);
+    setProductoEditandoId(producto.id);
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("adminLoggedIn");
     navigate("/login");
@@ -85,7 +105,7 @@ function Admin() {
         </button>
       </div>
 
-      <form onSubmit={handleAgregarProducto} className="row g-3 mb-4">
+      <form onSubmit={handleSubmitProducto} className="row g-3 mb-4">
         <div className="col-md-3">
           <input
             name="nombre"
@@ -149,7 +169,13 @@ function Admin() {
           />
         </div>
         <div className="col-md-2">
-          <button className="btn btn-success w-100">Agregar</button>
+          <button
+            className={`btn w-100 ${
+              modoEdicion ? "btn-warning" : "btn-success"
+            }`}
+          >
+            {modoEdicion ? "Guardar Cambios" : "Agregar"}
+          </button>
         </div>
       </form>
 
@@ -173,7 +199,12 @@ function Admin() {
               <td>{p.stock}</td>
               <td>{p.categoria}</td>
               <td>
-                <button className="btn btn-sm btn-warning me-2">Editar</button>
+                <button
+                  className="btn btn-sm btn-warning me-2"
+                  onClick={() => handleEditarProducto(p)}
+                >
+                  Editar
+                </button>
                 <button
                   className="btn btn-sm btn-danger"
                   onClick={() => handleEliminarProducto(p.id)}

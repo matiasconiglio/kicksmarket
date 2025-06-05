@@ -1,9 +1,13 @@
 import { useParams } from "react-router-dom";
-import productos from "../data/productos";
+import productosData from "../data/productos";
 
 function Detalle() {
   const { id } = useParams();
-  const producto = productos.find((p) => p.id === parseInt(id));
+
+  const productosLocal = JSON.parse(localStorage.getItem("productos"));
+  const productos = productosLocal || productosData;
+
+  const producto = productos.find((p) => p.id === Number(id));
 
   if (!producto) {
     return <h2 className="text-center mt-5">Producto no encontrado 😢</h2>;
@@ -22,7 +26,7 @@ function Detalle() {
         <div className="col-md-6">
           <h2>{producto.nombre}</h2>
           <p>
-            <strong>Marca:</strong> {producto.marca}
+            <strong>Marca:</strong> {producto.marca || "No especificada"}
           </p>
           <p>
             <strong>Categoría:</strong> {producto.categoria}
