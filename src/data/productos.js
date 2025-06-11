@@ -19,6 +19,16 @@ const productos = [
     imagen: "https://via.placeholder.com/300x200?text=Adidas+Ultraboost",
     descripcion: "Comodidad y performance con las Adidas Ultraboost.",
   },
+
+  {
+    id: 4,
+    nombre: "Nike ZoomX",
+    precio: 48000,
+    stock: 10,
+    categoria: "nike",
+    imagen: "https://i.ibb.co/xyz.jpg",
+    descripcion: "Zapatilla con amortiguación ZoomX para running",
+  },
 ];
 
 export default productos;

@@ -7,20 +7,19 @@ function Admin() {
   const [productos, setProductos] = useState([]);
   const [modoEdicion, setModoEdicion] = useState(false);
   const [productoEditandoId, setProductoEditandoId] = useState(null);
-  const [nuevoProducto, setNuevoProducto] = useState({
+
+  const [form, setForm] = useState({
     nombre: "",
     precio: "",
     stock: "",
     categoria: "",
-    imagen: "",
+    imagen: "", // ahora usamos imagen
     descripcion: "",
   });
 
   useEffect(() => {
     const logged = localStorage.getItem("adminLoggedIn");
-    if (logged !== "true") {
-      navigate("/login");
-    }
+    if (logged !== "true") navigate("/login");
 
     const almacenados = JSON.parse(localStorage.getItem("productos"));
     setProductos(almacenados || productosData);
@@ -28,43 +27,37 @@ function Admin() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNuevoProducto({ ...nuevoProducto, [name]: value });
+    setForm({ ...form, [name]: value });
   };
 
-  const handleSubmitProducto = (e) => {
+  const guardarProductos = (nuevos) => {
+    localStorage.setItem("productos", JSON.stringify(nuevos));
+    setProductos(nuevos);
+  };
+
+  const handleAgregarProducto = (e) => {
     e.preventDefault();
 
-    if (!nuevoProducto.imagen.startsWith("http")) {
-      alert("Por favor, ingresá una URL de imagen válida");
-      return;
-    }
-
     if (modoEdicion) {
-      // EDITAR
       const actualizados = productos.map((p) =>
         p.id === productoEditandoId
-          ? { ...nuevoProducto, id: productoEditandoId }
+          ? { ...p, ...form, precio: +form.precio, stock: +form.stock }
           : p
       );
-      setProductos(actualizados);
-      localStorage.setItem("productos", JSON.stringify(actualizados));
+      guardarProductos(actualizados);
       setModoEdicion(false);
       setProductoEditandoId(null);
     } else {
-      // AGREGAR
-      const id = Date.now();
       const nuevo = {
-        id,
-        ...nuevoProducto,
-        precio: Number(nuevoProducto.precio),
-        stock: Number(nuevoProducto.stock),
+        id: Date.now(),
+        ...form,
+        precio: +form.precio,
+        stock: +form.stock,
       };
-      const actualizados = [...productos, nuevo];
-      setProductos(actualizados);
-      localStorage.setItem("productos", JSON.stringify(actualizados));
+      guardarProductos([...productos, nuevo]);
     }
 
-    setNuevoProducto({
+    setForm({
       nombre: "",
       precio: "",
       stock: "",
@@ -74,21 +67,17 @@ function Admin() {
     });
   };
 
-  const handleEliminarProducto = (id) => {
-    const confirmacion = window.confirm(
-      "¿Seguro que querés eliminar este producto?"
-    );
-    if (!confirmacion) return;
-
-    const filtrados = productos.filter((p) => p.id !== id);
-    setProductos(filtrados);
-    localStorage.setItem("productos", JSON.stringify(filtrados));
-  };
-
-  const handleEditarProducto = (producto) => {
-    setNuevoProducto(producto);
+  const handleEditar = (producto) => {
     setModoEdicion(true);
     setProductoEditandoId(producto.id);
+    setForm(producto);
+  };
+
+  const handleEliminar = (id) => {
+    const confirm = window.confirm("¿Eliminar producto?");
+    if (!confirm) return;
+    const actualizados = productos.filter((p) => p.id !== id);
+    guardarProductos(actualizados);
   };
 
   const handleLogout = () => {
@@ -105,12 +94,12 @@ function Admin() {
         </button>
       </div>
 
-      <form onSubmit={handleSubmitProducto} className="row g-3 mb-4">
-        <div className="col-md-3">
+      <form onSubmit={handleAgregarProducto} className="row g-3 mb-4">
+        <div className="col-md-2">
           <input
             name="nombre"
             className="form-control"
-            value={nuevoProducto.nombre}
+            value={form.nombre}
             onChange={handleInputChange}
             placeholder="Nombre"
             required
@@ -121,7 +110,7 @@ function Admin() {
             name="precio"
             type="number"
             className="form-control"
-            value={nuevoProducto.precio}
+            value={form.precio}
             onChange={handleInputChange}
             placeholder="Precio"
             required
@@ -132,49 +121,35 @@ function Admin() {
             name="stock"
             type="number"
             className="form-control"
-            value={nuevoProducto.stock}
+            value={form.stock}
             onChange={handleInputChange}
             placeholder="Stock"
             required
           />
         </div>
-        <div className="col-md-3">
+        <div className="col-md-2">
           <input
             name="categoria"
             className="form-control"
-            value={nuevoProducto.categoria}
+            value={form.categoria}
             onChange={handleInputChange}
             placeholder="Categoría"
             required
           />
         </div>
-        <div className="col-md-4">
+        <div className="col-md-2">
           <input
             name="imagen"
             className="form-control"
-            value={nuevoProducto.imagen}
+            value={form.imagen}
             onChange={handleInputChange}
-            placeholder="URL de imagen"
-            required
-          />
-        </div>
-        <div className="col-md-8">
-          <input
-            name="descripcion"
-            className="form-control"
-            value={nuevoProducto.descripcion}
-            onChange={handleInputChange}
-            placeholder="Descripción"
+            placeholder="URL de Imagen"
             required
           />
         </div>
         <div className="col-md-2">
-          <button
-            className={`btn w-100 ${
-              modoEdicion ? "btn-warning" : "btn-success"
-            }`}
-          >
-            {modoEdicion ? "Guardar Cambios" : "Agregar"}
+          <button className="btn btn-success w-100">
+            {modoEdicion ? "Guardar" : "Agregar"}
           </button>
         </div>
       </form>
@@ -201,13 +176,13 @@ function Admin() {
               <td>
                 <button
                   className="btn btn-sm btn-warning me-2"
-                  onClick={() => handleEditarProducto(p)}
+                  onClick={() => handleEditar(p)}
                 >
                   Editar
                 </button>
                 <button
                   className="btn btn-sm btn-danger"
-                  onClick={() => handleEliminarProducto(p.id)}
+                  onClick={() => handleEliminar(p.id)}
                 >
                   Eliminar
                 </button>
