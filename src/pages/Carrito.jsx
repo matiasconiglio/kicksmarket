@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
+import "./Carrito.css";
 
 const Carrito = () => {
   const [carrito, setCarrito] = useState([]);
   const [total, setTotal] = useState(0);
 
-  // Leer carrito desde localStorage al montar el componente
   useEffect(() => {
     const guardado = JSON.parse(localStorage.getItem("carrito")) || [];
     setCarrito(guardado);
@@ -30,46 +30,48 @@ const Carrito = () => {
   };
 
   return (
-    <div className="container mt-5">
-      <h2 className="mb-4">🛒 Tu Carrito</h2>
+    <div className="carrito-container">
+      <h2 className="carrito-title">Tu Carrito</h2>
 
       {carrito.length === 0 ? (
-        <p className="text-muted">Tu carrito está vacío.</p>
+        <p className="carrito-vacio">Tu carrito está vacío.</p>
       ) : (
         <>
-          <table className="table table-dark table-hover">
-            <thead>
-              <tr>
-                <th>Producto</th>
-                <th>Precio</th>
-                <th>Cantidad</th>
-                <th>Subtotal</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {carrito.map((item) => (
-                <tr key={item.id}>
-                  <td>{item.nombre}</td>
-                  <td>${item.precio}</td>
-                  <td>{item.cantidad}</td>
-                  <td>${item.precio * item.cantidad}</td>
-                  <td>
-                    <button
-                      className="btn btn-danger btn-sm"
-                      onClick={() => eliminarProducto(item.id)}
-                    >
-                      ❌
-                    </button>
-                  </td>
+          <div className="carrito-tabla-wrapper">
+            <table className="carrito-tabla">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Precio</th>
+                  <th>Cantidad</th>
+                  <th>Subtotal</th>
+                  <th></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {carrito.map((item) => (
+                  <tr key={item.id}>
+                    <td>{item.nombre}</td>
+                    <td>${item.precio.toLocaleString()}</td>
+                    <td>{item.cantidad}</td>
+                    <td>${(item.precio * item.cantidad).toLocaleString()}</td>
+                    <td>
+                      <button
+                        className="btn-eliminar"
+                        onClick={() => eliminarProducto(item.id)}
+                      >
+                        Eliminar
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-          <div className="d-flex justify-content-between align-items-center mt-4">
-            <h4>Total: ${total}</h4>
-            <button className="btn btn-outline-light" onClick={vaciarCarrito}>
+          <div className="carrito-footer">
+            <h4>Total: ${total.toLocaleString()}</h4>
+            <button className="btn-vaciar" onClick={vaciarCarrito}>
               Vaciar Carrito
             </button>
           </div>

@@ -5,17 +5,25 @@ import "./Navbar.css";
 const Navbar = () => {
   const navigate = useNavigate();
   const [cantidadCarrito, setCantidadCarrito] = useState(0);
+  const [adminActivo, setAdminActivo] = useState(false);
 
-  // 🔄 Escuchar cambios en localStorage
   useEffect(() => {
     const intervalo = setInterval(() => {
       const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
       const total = carrito.reduce((acc, item) => acc + item.cantidad, 0);
       setCantidadCarrito(total);
+
+      const logged = sessionStorage.getItem("adminLoggedIn") === "true";
+      setAdminActivo(logged);
     }, 300);
 
     return () => clearInterval(intervalo);
   }, []);
+
+  const handleLogout = () => {
+    sessionStorage.removeItem("adminLoggedIn");
+    navigate("/");
+  };
 
   return (
     <nav className="navbar-main">
@@ -41,11 +49,26 @@ const Navbar = () => {
               🛍️ Carrito ({cantidadCarrito})
             </NavLink>
           </li>
-          <li>
-            <NavLink to="/login" className="nav-item">
-              Admin
-            </NavLink>
-          </li>
+          {!adminActivo ? (
+            <li>
+              <NavLink to="/login" className="nav-item">
+                Admin
+              </NavLink>
+            </li>
+          ) : (
+            <>
+              <li>
+                <NavLink to="/admin" className="nav-item">
+                  Panel Admin
+                </NavLink>
+              </li>
+              <li>
+                <button className="btn-cerrar-sesion" onClick={handleLogout}>
+                  Cerrar sesión
+                </button>
+              </li>
+            </>
+          )}
         </ul>
       </div>
     </nav>

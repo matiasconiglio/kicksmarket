@@ -6,7 +6,6 @@ function Login() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  // Simulamos un admin hardcodeado
   const adminUser = {
     email: "admin@kicks.com",
     password: "admin123",
@@ -16,7 +15,7 @@ function Login() {
     e.preventDefault();
 
     if (email === adminUser.email && password === adminUser.password) {
-      localStorage.setItem("adminLoggedIn", "true");
+      sessionStorage.setItem("adminLoggedIn", "true");
       navigate("/admin");
     } else {
       alert("Usuario o contraseña incorrectos");

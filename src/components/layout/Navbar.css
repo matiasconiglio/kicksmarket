@@ -91,3 +91,21 @@
 .nav-item:hover::after {
   width: 100%;
 }
+
+/* Botón de cerrar sesión estilizado */
+.btn-cerrar-sesion {
+  background-color: transparent;
+  color: #c0d6e4;
+  border: 1px solid #468faf;
+  padding: 6px 12px;
+  font-size: 0.95rem;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-cerrar-sesion:hover {
+  background-color: #468faf;
+  color: #fff;
+  border-color: #468faf;
+}

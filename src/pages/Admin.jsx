@@ -7,23 +7,27 @@ function Admin() {
   const [productos, setProductos] = useState([]);
   const [modoEdicion, setModoEdicion] = useState(false);
   const [productoEditandoId, setProductoEditandoId] = useState(null);
+  const [checkingAuth, setCheckingAuth] = useState(true); // 👈
 
   const [form, setForm] = useState({
     nombre: "",
     precio: "",
     stock: "",
     categoria: "",
-    imagen: "", // ahora usamos imagen
+    imagen: "",
     descripcion: "",
   });
 
   useEffect(() => {
-    const logged = localStorage.getItem("adminLoggedIn");
-    if (logged !== "true") navigate("/login");
-
-    const almacenados = JSON.parse(localStorage.getItem("productos"));
-    setProductos(almacenados || productosData);
-  }, []);
+    const logged = sessionStorage.getItem("adminLoggedIn");
+    if (logged !== "true") {
+      navigate("/login");
+    } else {
+      const almacenados = JSON.parse(localStorage.getItem("productos"));
+      setProductos(almacenados || productosData);
+      setCheckingAuth(false); // ✅ listo para mostrar
+    }
+  }, [navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -81,9 +85,11 @@ function Admin() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("adminLoggedIn");
+    sessionStorage.removeItem("adminLoggedIn");
     navigate("/login");
   };
+
+  if (checkingAuth) return null; // 🛡 Previene parpadeos si aún no validó sesión
 
   return (
     <div className="container mt-4">
@@ -147,6 +153,16 @@ function Admin() {
             required
           />
         </div>
+        <div className="col-md-10">
+          <textarea
+            name="descripcion"
+            className="form-control"
+            value={form.descripcion}
+            onChange={handleInputChange}
+            placeholder="Descripción del producto"
+            rows={2}
+          ></textarea>
+        </div>
         <div className="col-md-2">
           <button className="btn btn-success w-100">
             {modoEdicion ? "Guardar" : "Agregar"}
@@ -154,10 +170,10 @@ function Admin() {
         </div>
       </form>
 
-      <table className="table table-bordered table-hover">
+      <table className="table table-bordered table-hover text-center">
         <thead className="table-dark">
           <tr>
-            <th>#</th>
+            <th>Imagen</th>
             <th>Producto</th>
             <th>Precio</th>
             <th>Stock</th>
@@ -168,7 +184,9 @@ function Admin() {
         <tbody>
           {productos.map((p) => (
             <tr key={p.id}>
-              <td>{p.id}</td>
+              <td>
+                <img src={p.imagen} alt={p.nombre} style={{ width: "50px" }} />
+              </td>
               <td>{p.nombre}</td>
               <td>${p.precio}</td>
               <td>{p.stock}</td>
