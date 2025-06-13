@@ -7,7 +7,7 @@ import About from "./pages/About";
 import Detalle from "./pages/Detalle";
 import Navbar from "./components/layout/Navbar";
 import PrivateRoute from "./components/PrivateRoute";
-import Carrito from "./pages/Carrito";
+import Carrito from "./pages/CarritoSidebar";
 
 function App() {
   return (

@@ -1,0 +1,81 @@
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease-in-out;
+  z-index: 999;
+}
+
+.sidebar-overlay.visible {
+  right: 0;
+}
+
+.sidebar-carrito {
+  position: absolute;
+  right: 0;
+  top: 0;
+  background: white;
+  width: 350px;
+  height: 100%;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+}
+
+.carrito-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.carrito-items {
+  flex-grow: 1;
+  overflow-y: auto;
+  margin-top: 1rem;
+}
+
+.item {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.item img {
+  width: 60px;
+  border-radius: 8px;
+}
+
+.qty {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.carrito-footer {
+  border-top: 1px solid #ddd;
+  padding-top: 1rem;
+}
+
+.total {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.btn-pagar {
+  background-color: #ff5722;
+  color: #fff;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+}
