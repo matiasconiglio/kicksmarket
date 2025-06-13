@@ -17,14 +17,27 @@ function Login() {
     if (email === adminUser.email && password === adminUser.password) {
       sessionStorage.setItem("adminLoggedIn", "true");
       navigate("/admin");
+      return;
+    }
+
+    // Buscar usuario común
+    const usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+    const usuario = usuarios.find(
+      (u) => u.email === email && u.password === password
+    );
+
+    if (usuario) {
+      sessionStorage.setItem("usuarioLogueado", JSON.stringify(usuario));
+      alert(`Bienvenido ${usuario.nombre}`);
+      navigate("/");
     } else {
-      alert("Usuario o contraseña incorrectos");
+      alert("❌ Usuario o contraseña incorrectos");
     }
   };
 
   return (
     <div className="container mt-5" style={{ maxWidth: "400px" }}>
-      <h2 className="text-center mb-4">Login Admin</h2>
+      <h2 className="text-center mb-4">Login</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <label>Email:</label>

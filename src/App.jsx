@@ -1,5 +1,6 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Routes, Route } from "react-router-dom";
+import { useState } from "react";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Admin from "./pages/Admin";
@@ -7,18 +8,22 @@ import About from "./pages/About";
 import Detalle from "./pages/Detalle";
 import Navbar from "./components/layout/Navbar";
 import PrivateRoute from "./components/PrivateRoute";
-import Carrito from "./pages/CarritoSidebar";
+import CarritoSidebar from "./pages/CarritoSidebar";
+import Register from "./pages/Register";
 
 function App() {
+  const [mostrarCarrito, setMostrarCarrito] = useState(false);
+
   return (
     <>
-      <Navbar />
+      <Navbar onAbrirCarrito={() => setMostrarCarrito(true)} />
+
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/about" element={<About />} />
         <Route path="/detalle/:id" element={<Detalle />} />
-        <Route path="/carrito" element={<Carrito />} />
+        <Route path="/register" element={<Register />} />
 
         {/* RUTA PROTEGIDA */}
         <Route
@@ -37,6 +42,11 @@ function App() {
           }
         />
       </Routes>
+
+      <CarritoSidebar
+        abierto={mostrarCarrito}
+        cerrar={() => setMostrarCarrito(false)}
+      />
     </>
   );
 }

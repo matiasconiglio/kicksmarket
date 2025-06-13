@@ -2,10 +2,11 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "./Navbar.css";
 
-const Navbar = () => {
+const Navbar = ({ onAbrirCarrito }) => {
   const navigate = useNavigate();
   const [cantidadCarrito, setCantidadCarrito] = useState(0);
   const [adminActivo, setAdminActivo] = useState(false);
+  const [usuario, setUsuario] = useState(null);
 
   useEffect(() => {
     const intervalo = setInterval(() => {
@@ -13,8 +14,11 @@ const Navbar = () => {
       const total = carrito.reduce((acc, item) => acc + item.cantidad, 0);
       setCantidadCarrito(total);
 
-      const logged = sessionStorage.getItem("adminLoggedIn") === "true";
-      setAdminActivo(logged);
+      const admin = sessionStorage.getItem("adminLoggedIn") === "true";
+      const user = JSON.parse(sessionStorage.getItem("usuarioLogueado"));
+
+      setAdminActivo(admin);
+      setUsuario(user);
     }, 300);
 
     return () => clearInterval(intervalo);
@@ -22,6 +26,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     sessionStorage.removeItem("adminLoggedIn");
+    sessionStorage.removeItem("usuarioLogueado");
     navigate("/");
   };
 
@@ -45,12 +50,12 @@ const Navbar = () => {
             </NavLink>
           </li>
           <li>
-            <NavLink to="/carrito" className="nav-item">
+            <button className="nav-item" onClick={onAbrirCarrito}>
               Carrito ({cantidadCarrito})
-            </NavLink>
+            </button>
           </li>
 
-          {!adminActivo ? (
+          {!adminActivo && !usuario ? (
             <>
               <li>
                 <NavLink to="/login" className="nav-item">
@@ -61,6 +66,15 @@ const Navbar = () => {
                 <NavLink to="/register" className="nav-item">
                   Registrarse
                 </NavLink>
+              </li>
+            </>
+          ) : usuario ? (
+            <>
+              <li className="nav-item">Hola, {usuario.nombre} 👋</li>
+              <li>
+                <button className="btn-cerrar-sesion" onClick={handleLogout}>
+                  Cerrar sesión
+                </button>
               </li>
             </>
           ) : (
